@@ -1,0 +1,25 @@
+using ValueDispatch, Static, Test
+
+@testset "ValueDispatch.jl" begin
+    # Dispatch over a range of runtime integers
+    for v in 0:7
+        @test valuedispatch(static(0), static(7), v, identity) === static(v)
+    end
+
+    # Single-element range (lower == upper)
+    @test valuedispatch(static(3), static(3), 3, x -> x + static(1)) === static(4)
+
+    # Inverted range (lower > upper returns fun(upper))
+    @test valuedispatch(static(5), static(2), 4, identity) === static(2)
+
+    # Out-of-bounds clamping behavior
+    @test valuedispatch(static(2), static(6), 0, identity) === static(2)
+    @test valuedispatch(static(2), static(6), 10, identity) === static(6)
+
+    # Negative ranges and non-Int integer types
+    for v in -3:3
+        @test valuedispatch(static(-3), static(3), Int32(v), x -> dynamic(x) * 2) == 2 * v
+    end
+    @test valuedispatch(1, 5, 4, identity) === static(4)
+    @test valuedispatch(1, 5, Int32(2), identity) === static(2)
+end
