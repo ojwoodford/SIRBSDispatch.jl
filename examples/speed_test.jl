@@ -1,5 +1,5 @@
-# Speed test comparing dynamic dispatch on StaticInt to compile-time ValueDispatch
-using ValueDispatch
+# Speed test comparing dynamic dispatch on StaticInt to compile-time SIRBSDispatch
+using SIRBSDispatch
 using Static
 using Random
 
@@ -24,7 +24,7 @@ end
 """
     run_speed_test(N=1_000_000, trials=3)
 
-Benchmark dynamic dispatch against `ValueDispatch.valuedispatch` across various ranges,
+Benchmark dynamic dispatch against `SIRBSDispatch.sirbsdispatch` across various ranges,
 testing both unsorted (random branch patterns) and sorted (predictable branch patterns) inputs.
 """
 function run_speed_test(N::Int=1_000_000, trials::Int=3)
@@ -37,14 +37,14 @@ function run_speed_test(N::Int=1_000_000, trials::Int=3)
     ]
 
     println("=" ^ 82)
-    println("ValueDispatch.jl Speed Test: Dynamic Dispatch vs ValueDispatch")
+    println("SIRBSDispatch.jl Speed Test: Dynamic Dispatch vs SIRBSDispatch")
     println("Iterations per range: $N | Trials: $trials")
     println("=" ^ 82)
 
     for is_sorted in (false, true)
         mode = is_sorted ? "Sorted Inputs (Predictable Branches)" : "Unsorted Inputs (Random / Branch Misses)"
         println("\n### $mode\n")
-        println("| Range | Values | Dynamic Dispatch | ValueDispatch | Speedup | Time Reduction |")
+        println("| Range | Values | Dynamic Dispatch | SIRBSDispatch | Speedup | Time Reduction |")
         println("|:-----:|:------:|:----------------:|:-------------:|:-------:|:--------------:|")
 
         for (lower, upper) in ranges
@@ -53,7 +53,7 @@ function run_speed_test(N::Int=1_000_000, trials::Int=3)
             vals = rand(L:U, N)
 
             dyn_call(v) = compute(static(v))
-            vd_call(v) = valuedispatch(lower, upper, v, compute)
+            vd_call(v) = sirbsdispatch(lower, upper, v, compute)
 
             # Warm-up JIT compilation on unsorted values so all code paths are compiled
             timetrial(dyn_call, vals[1:10_000])
