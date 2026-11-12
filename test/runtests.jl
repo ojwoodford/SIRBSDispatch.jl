@@ -1,4 +1,4 @@
-using SIRBSDispatch, Static, Test
+using Aqua, SIRBSDispatch, Static, Test
 
 @testset "SIRBSDispatch.jl" begin
     # Dispatch over a range of runtime integers
@@ -39,4 +39,17 @@ using SIRBSDispatch, Static, Test
     doc = string(@doc sirbsdispatch)
     @test occursin("inverted", doc)
     @test occursin("4096", doc)
+end
+
+@testset "Aqua" begin
+    Aqua.test_all(SIRBSDispatch)
+end
+
+@testset "Allocations" begin
+    # Function-barrier call: the dispatch itself must not allocate
+    @noinline barrier(x) = dynamic(x) * 2
+    run(v) = sirbsdispatch(static(0), static(31), v, barrier)
+    run(5) # compile
+    @test (@allocated run(5)) == 0
+    @test (@allocated run(31)) == 0
 end
