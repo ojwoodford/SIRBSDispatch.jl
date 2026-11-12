@@ -9,8 +9,10 @@ using Aqua, SIRBSDispatch, Static, Test
     # Single-element range (lower == upper)
     @test sirbsdispatch(static(3), static(3), 3, x -> x + static(1)) === static(4)
 
-    # Inverted range (lower > upper returns fun(upper))
-    @test sirbsdispatch(static(5), static(2), 4, identity) === static(2)
+    # Inverted range (lower > upper) is an error
+    @test_throws ArgumentError sirbsdispatch(static(5), static(2), 4, identity)
+    @test_throws ArgumentError sirbsdispatch(static(1), static(0), 1, identity)
+    @test_throws ArgumentError sirbsdispatch(5, 2, 4, identity)
 
     # Out-of-bounds clamping behavior
     @test sirbsdispatch(static(2), static(6), 0, identity) === static(2)
@@ -38,6 +40,7 @@ using Aqua, SIRBSDispatch, Static, Test
     # Docstring documents the inverted-range behaviour
     doc = string(@doc sirbsdispatch)
     @test occursin("inverted", doc)
+    @test occursin("ArgumentError", doc)
     @test occursin("4096", doc)
 end
 

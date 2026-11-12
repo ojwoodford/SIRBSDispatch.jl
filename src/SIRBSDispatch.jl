@@ -10,7 +10,7 @@ const MAX_RANGE = 4096
 function build_dispatch_tree(L::Int, U::Int)
     U - L <= MAX_RANGE || throw(ArgumentError(
         "sirbsdispatch range [$L, $U] is too large (U - L must be <= $MAX_RANGE)"))
-    if L >= U
+    if L == U
         return :(fun(Static.static($U)))
     end
     midpoint = L + div(U - L, 2)
@@ -29,7 +29,7 @@ Converts a runtime integer `val` within the known static range `[lower, upper]` 
 compile-time `StaticInt` using an unrolled binary-search decision tree, and invokes `fun(static_val)`.
 
 If `val <= lower`, `fun(static(lower))` is called; if `val >= upper`, `fun(static(upper))` is called.
-If the range is inverted (`lower > upper`), `fun(static(upper))` is called for every `val`.
+An inverted range (`lower > upper`) is an error and throws an `ArgumentError`.
 The range may span at most $MAX_RANGE values beyond `lower` (`upper - lower <= $MAX_RANGE`);
 larger ranges throw an `ArgumentError`.
 
@@ -46,6 +46,8 @@ y = sirbsdispatch(static(1), static(8), 5, x -> x + static(10)) # static(15)
 ```
 """
 @inline @generated function sirbsdispatch(::StaticInt{L}, ::StaticInt{U}, val::Int, fun::F) where {L, U, F}
+    L <= U || throw(ArgumentError(
+        "sirbsdispatch requires lower <= upper, got lower = $L, upper = $U"))
     return build_dispatch_tree(L, U)
 end
 
