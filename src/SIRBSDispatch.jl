@@ -30,6 +30,11 @@ compile-time `StaticInt` using an unrolled binary-search decision tree, and invo
 
 If `val <= lower`, `fun(static(lower))` is called; if `val >= upper`, `fun(static(upper))` is called.
 
+The `Integer` bounds method is only efficient when `lower` and `upper` are compile-time
+constants (e.g. literals), so that `static(Int(lower))` constant-folds. With runtime-valued
+bounds the `StaticInt` type is not inferable and the call dispatches dynamically, losing the
+benefit of this package; pass `StaticInt` bounds instead.
+
 # Example
 ```julia
 using SIRBSDispatch, Static

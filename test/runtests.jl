@@ -26,4 +26,8 @@ using SIRBSDispatch, Static, Test
     # Range size guard
     @test_throws ArgumentError sirbsdispatch(static(0), static(10^6), 5, identity)
     @test sirbsdispatch(static(0), static(4096), 4096, identity) === static(4096)
+
+    # Integer bounds method infers when the bounds are literals
+    literal_bounds(v) = sirbsdispatch(1, 5, v, x -> dynamic(x) * 2)
+    @test @inferred(literal_bounds(3)) == 6
 end
