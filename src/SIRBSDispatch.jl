@@ -4,7 +4,12 @@ using Static
 
 export sirbsdispatch
 
+# Maximum number of values (U - L) in a range, to avoid compiling enormous trees.
+const MAX_RANGE = 4096
+
 function build_dispatch_tree(L::Int, U::Int)
+    U - L <= MAX_RANGE || throw(ArgumentError(
+        "sirbsdispatch range [$L, $U] is too large (U - L must be <= $MAX_RANGE)"))
     if L >= U
         return :(fun(Static.static($U)))
     end

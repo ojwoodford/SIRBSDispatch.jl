@@ -22,4 +22,8 @@ using SIRBSDispatch, Static, Test
     end
     @test sirbsdispatch(1, 5, 4, identity) === static(4)
     @test sirbsdispatch(1, 5, Int32(2), identity) === static(2)
+
+    # Range size guard
+    @test_throws ArgumentError sirbsdispatch(static(0), static(10^6), 5, identity)
+    @test sirbsdispatch(static(0), static(4096), 4096, identity) === static(4096)
 end
