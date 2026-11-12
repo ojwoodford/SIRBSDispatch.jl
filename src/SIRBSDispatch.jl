@@ -29,6 +29,9 @@ Converts a runtime integer `val` within the known static range `[lower, upper]` 
 compile-time `StaticInt` using an unrolled binary-search decision tree, and invokes `fun(static_val)`.
 
 If `val <= lower`, `fun(static(lower))` is called; if `val >= upper`, `fun(static(upper))` is called.
+If the range is inverted (`lower > upper`), `fun(static(upper))` is called for every `val`.
+The range may span at most $MAX_RANGE values beyond `lower` (`upper - lower <= $MAX_RANGE`);
+larger ranges throw an `ArgumentError`.
 
 The `Integer` bounds method is only efficient when `lower` and `upper` are compile-time
 constants (e.g. literals), so that `static(Int(lower))` constant-folds. With runtime-valued

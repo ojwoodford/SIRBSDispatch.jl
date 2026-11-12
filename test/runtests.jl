@@ -34,4 +34,9 @@ using SIRBSDispatch, Static, Test
     # Specialization on a function passed through the forwarding methods
     fwd(v) = sirbsdispatch(static(1), static(3), v, x -> dynamic(x) + 1)
     @test @inferred(fwd(Int32(2))) == 3
+
+    # Docstring documents the inverted-range behaviour
+    doc = string(@doc sirbsdispatch)
+    @test occursin("inverted", doc)
+    @test occursin("4096", doc)
 end
