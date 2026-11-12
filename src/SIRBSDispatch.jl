@@ -42,14 +42,14 @@ using SIRBSDispatch, Static
 y = sirbsdispatch(static(1), static(8), 5, x -> x + static(10)) # static(15)
 ```
 """
-@inline @generated function sirbsdispatch(::StaticInt{L}, ::StaticInt{U}, val::Int, fun) where {L, U}
+@inline @generated function sirbsdispatch(::StaticInt{L}, ::StaticInt{U}, val::Int, fun::F) where {L, U, F}
     return build_dispatch_tree(L, U)
 end
 
-@inline sirbsdispatch(lower::StaticInt, upper::StaticInt, val::Integer, fun) =
+@inline sirbsdispatch(lower::StaticInt, upper::StaticInt, val::Integer, fun::F) where {F} =
     sirbsdispatch(lower, upper, Int(val), fun)
 
-@inline sirbsdispatch(lower::Integer, upper::Integer, val::Integer, fun) =
+@inline sirbsdispatch(lower::Integer, upper::Integer, val::Integer, fun::F) where {F} =
     sirbsdispatch(static(Int(lower)), static(Int(upper)), Int(val), fun)
 
 end # module SIRBSDispatch
